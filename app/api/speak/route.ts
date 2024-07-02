@@ -1,33 +1,5 @@
 import { Message } from "ai";
 import { NextRequest, NextResponse } from "next/server";
-import { ElevenLabsClient } from "elevenlabs";
-import { Readable } from "stream";
-
-/**
- * Converts a Node.js Readable stream to a web-compatible ReadableStream.
- * @param {Readable} nodeStream - The Node.js Readable stream
- * @returns {ReadableStream} - The web-compatible ReadableStream
- */
-function nodeStreamToWebReadableStream(
-  nodeStream: Readable
-): ReadableStream<Uint8Array> {
-  return new ReadableStream({
-    start(controller) {
-      nodeStream.on("data", (chunk) => {
-        controller.enqueue(new Uint8Array(chunk));
-      });
-      nodeStream.on("end", () => {
-        controller.close();
-      });
-      nodeStream.on("error", (err) => {
-        controller.error(err);
-      });
-    },
-    cancel() {
-      nodeStream.destroy();
-    }
-  });
-}
 
 /**
  * Return a stream from the API
@@ -36,7 +8,8 @@ function nodeStreamToWebReadableStream(
  */
 export async function POST(req: NextRequest) {
   const url = req.url;
-  const model = req.nextUrl.searchParams.get("model") ?? "aura-asteria-en";
+  const voiceId = "TVJU2ZYIJJZr8TDEVxBb"; // replace "default_voice_id" with your default voice ID if needed
+  const modelId = "eleven_multilingual_v2";
   const message: Message = await req.json();
   const start = Date.now();
 
@@ -57,32 +30,41 @@ export async function POST(req: NextRequest) {
       }
     );
 
-  try {
-    const headers = new Headers();
-    headers.set("X-DG-Latency", `${Date.now() - start}`);
-    headers.set("Content-Type", "audio/mp3");
+  const requestBody = {
+    text,
+    model_id: modelId,
+    voice_settings: {
+      stability: 0.75, // Customize these values as needed
+      similarity_boost: 0.75, // Customize these values as needed
+    },
+  };
 
-    const elevenlabs = new ElevenLabsClient({
-      apiKey: process.env.ELEVENLABS_API_KEY // Ensure this environment variable is set
-    });
+  return await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`,
+    {
+      method: "POST",
+      body: JSON.stringify(requestBody),
+      headers: {
+        "Content-Type": "application/json",
+        "xi-api-key": process.env.ELEVENLABS_API_KEY || "",
+        "X-Request-Referrer": url,
+      },
+    }
+  )
+    .then(async (response) => {
+      const headers = new Headers();
+      headers.set("X-DG-Latency", `${Date.now() - start}`);
+      headers.set("Content-Type", "audio/mp3");
 
-    const audioStream: Readable = await elevenlabs.generate({
-      stream: true,
-      voice: "Rachel",
-      text: text,
-      model_id: "eleven_multilingual_v2"
-    });
+      if (!response?.body) {
+        return new NextResponse("Unable to get response from API.", {
+          status: 500,
+        });
+      }
 
-    const webReadableStream = nodeStreamToWebReadableStream(audioStream);
-
-    return new NextResponse(webReadableStream, {
-      headers,
-      status: 200
+      return new NextResponse(response.body, { headers });
+    })
+    .catch((error: any) => {
+      return new NextResponse(error || error?.message, { status: 500 });
     });
-  } catch (error: any) {
-    console.error("Error generating audio:", error);
-    return new NextResponse(error.message || "Internal Server Error", {
-      status: 500
-    });
-  }
 }
