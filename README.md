@@ -1,22 +1,12 @@
-# Deepgram AI Agent Technical Demo 
+# Deepgram AI Agent Technical Demo
 
 Combine Text-to-Speech and Speech-to-Text into a conversational agent.
-
-> Project codename EmilyAI
-
-[![Discord](https://dcbadge.vercel.app/api/server/xWRaCDBtW4?style=flat)](https://discord.gg/xWRaCDBtW4)
 
 The purpose of this demo is to showcase how you can build a Conversational AI application that engages users in natural language interactions, mimicking human conversation through natural language processing using [Deepgram](https://deepgram.com/).
 
 Examples of where you would see this type of application include: virtual assistants for tasks like answering queries and controlling smart devices, educational tutors for personalized learning, healthcare advisors for medical information, and entertainment chat bots for engaging conversations and games.
 
 These applications aim to enhance user experiences by offering efficient and intuitive interactions, reducing the need for human intervention in various tasks and services.
-
-## Issue Reporting
-
-If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker.
-
-Check out our [KNOWN ISSUES](./KNOWN_ISSUES.md) before reporting.
 
 ## Demo features
 
@@ -40,7 +30,7 @@ Follow these steps to get started with this starter application.
 
 #### Clone the repository
 
-Go to GitHub and [clone the repository](https://github.com/deepgram-starters/live-nextjs-starter).
+Go to GitHub and [clone the repository](https://github.com/shinydev1992/voice-chatting-demo.git).
 
 #### Install dependencies
 
@@ -71,19 +61,3 @@ Once running, you can [access the application in your browser](http://localhost:
 ```bash
 npm run dev
 ```
-
-## Getting Help
-
-We love to hear from you so if you have questions, comments or find a bug in the project, let us know! You can either:
-
-- [Open an issue in this repository](https://github.com/deepgram-devs/deepgram-aura-tts-demo/issues)
-- [Join the Deepgram Github Discussions Community](https://github.com/orgs/deepgram/discussions)
-- [Join the Deepgram Discord Community](https://discord.gg/xWRaCDBtW4)
-
-## Author
-
-[Deepgram](https://deepgram.com)
-
-## License
-
-This project is licensed under the MIT license. See the [LICENSE](./LICENSE) file for more info.

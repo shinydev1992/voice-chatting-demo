@@ -4,7 +4,7 @@ import {
   LiveClient,
   LiveConnectionState,
   LiveTranscriptionEvent,
-  LiveTranscriptionEvents,
+  LiveTranscriptionEvents
 } from "@deepgram/sdk";
 import { Message, useChat } from "ai/react";
 import { NextUIProvider } from "@nextui-org/react";
@@ -17,7 +17,7 @@ import { ChatBubble } from "./ChatBubble";
 import {
   contextualGreeting,
   generateRandomString,
-  utteranceText,
+  utteranceText
 } from "../lib/helpers";
 import { Controls } from "./Controls";
 import { InitialLoad } from "./InitialLoad";
@@ -47,7 +47,7 @@ export default function Conversation(): JSX.Element {
     queueSize: microphoneQueueSize,
     firstBlob,
     removeBlob,
-    stream,
+    stream
   } = useMicrophone();
 
   /**
@@ -56,7 +56,7 @@ export default function Conversation(): JSX.Element {
   const {
     add: addTranscriptPart,
     queue: transcriptParts,
-    clear: clearTranscriptParts,
+    clear: clearTranscriptParts
   } = useQueue<{ is_final: boolean; speech_final: boolean; text: string }>([]);
 
   /**
@@ -78,11 +78,14 @@ export default function Conversation(): JSX.Element {
       const start = Date.now();
       const model = ttsOptions?.model ?? "aura-asteria-en";
 
-      const res = await fetch(`/api/speak?model=${model}`, {
-        cache: "no-store",
-        method: "POST",
-        body: JSON.stringify(message),
-      });
+      const res = await fetch(
+        `https://chatbot.poolwater-pro.com/api/deepgram/speak?model=${model}`,
+        {
+          cache: "no-store",
+          method: "POST",
+          body: JSON.stringify(message)
+        }
+      );
 
       const headers = res.headers;
 
@@ -94,7 +97,7 @@ export default function Conversation(): JSX.Element {
           blob,
           latency: Number(headers.get("X-DG-Latency")) ?? Date.now() - start,
           networkLatency: Date.now() - start,
-          model,
+          model
         });
       });
     },
@@ -109,7 +112,7 @@ export default function Conversation(): JSX.Element {
 
   const onFinish = useCallback(
     (msg: any) => {
-      requestTtsAudio(msg);
+      // requestTtsAudio(msg);
     },
     [requestTtsAudio]
   );
@@ -118,7 +121,7 @@ export default function Conversation(): JSX.Element {
     (async () => {
       setLlmNewLatency({
         start: Number(res.headers.get("x-llm-start")),
-        response: Number(res.headers.get("x-llm-response")),
+        response: Number(res.headers.get("x-llm-response"))
       });
     })();
   }, []);
@@ -127,7 +130,7 @@ export default function Conversation(): JSX.Element {
     () => ({
       id: generateRandomString(7),
       role: "system",
-      content: systemContent,
+      content: systemContent
     }),
     []
   );
@@ -136,7 +139,7 @@ export default function Conversation(): JSX.Element {
     () => ({
       id: generateRandomString(7),
       role: "assistant",
-      content: contextualGreeting(),
+      content: contextualGreeting()
     }),
     []
   );
@@ -150,13 +153,13 @@ export default function Conversation(): JSX.Element {
     handleInputChange,
     input,
     handleSubmit,
-    isLoading: llmLoading,
+    isLoading: llmLoading
   } = useChat({
     id: "aura",
-    api: "/api/brain",
+    api: "https://chatbot.poolwater-pro.com/api/chat/marketing",
     initialMessages: [systemMessage, greetingMessage],
     onFinish,
-    onResponse,
+    onResponse
   });
 
   const [currentUtterance, setCurrentUtterance] = useState<string>();
@@ -178,7 +181,7 @@ export default function Conversation(): JSX.Element {
           setFailsafeTriggered(true);
           append({
             role: "user",
-            content: currentUtterance,
+            content: currentUtterance
           });
           clearTranscriptParts();
           setCurrentUtterance(undefined);
@@ -218,20 +221,18 @@ export default function Conversation(): JSX.Element {
     onSpeechStart,
     onSpeechEnd,
     positiveSpeechThreshold: 0.6,
-    negativeSpeechThreshold: 0.6 - 0.15,
+    negativeSpeechThreshold: 0.6 - 0.15
   });
 
   useEffect(() => {
     if (llmLoading) return;
     if (!llmNewLatency) return;
-
     const latestLlmMessage: MessageMetadata = {
       ...chatMessages[chatMessages.length - 1],
       ...llmNewLatency,
       end: Date.now(),
-      ttsModel: ttsOptions?.model,
+      ttsModel: ttsOptions?.model
     };
-
     addMessageData(latestLlmMessage);
   }, [
     chatMessages,
@@ -239,7 +240,7 @@ export default function Conversation(): JSX.Element {
     setLlmNewLatency,
     llmLoading,
     addMessageData,
-    ttsOptions?.model,
+    ttsOptions?.model
   ]);
 
   /**
@@ -257,7 +258,7 @@ export default function Conversation(): JSX.Element {
     // add a stub message data with no latency
     const welcomeMetadata: MessageMetadata = {
       ...greetingMessage,
-      ttsModel: ttsOptions?.model,
+      ttsModel: ttsOptions?.model
     };
 
     addMessageData(welcomeMetadata);
@@ -269,7 +270,7 @@ export default function Conversation(): JSX.Element {
     greetingMessage,
     initialLoad,
     requestWelcomeAudio,
-    ttsOptions?.model,
+    ttsOptions?.model
   ]);
 
   useEffect(() => {
@@ -284,7 +285,7 @@ export default function Conversation(): JSX.Element {
         addTranscriptPart({
           is_final: data.is_final as boolean,
           speech_final: data.speech_final as boolean,
-          text: content,
+          text: content
         });
       }
     };
@@ -356,7 +357,7 @@ export default function Conversation(): JSX.Element {
       clearTimeout(failsafeTimeout);
       append({
         role: "user",
-        content,
+        content
       });
       clearTranscriptParts();
       setCurrentUtterance(undefined);
@@ -366,7 +367,7 @@ export default function Conversation(): JSX.Element {
     clearTranscriptParts,
     append,
     failsafeTimeout,
-    failsafeTriggered,
+    failsafeTriggered
   ]);
 
   /**
@@ -402,7 +403,7 @@ export default function Conversation(): JSX.Element {
     firstBlob,
     microphoneQueueSize,
     isProcessing,
-    connectionReady,
+    connectionReady
   ]);
 
   /**
@@ -433,7 +434,7 @@ export default function Conversation(): JSX.Element {
   useEffect(() => {
     if (messageMarker.current) {
       messageMarker.current.scrollIntoView({
-        behavior: "auto",
+        behavior: "auto"
       });
     }
   }, [chatMessages]);
@@ -448,11 +449,13 @@ export default function Conversation(): JSX.Element {
                 <div
                   className={`flex flex-col h-full overflow-hidden ${
                     initialLoad ? "justify-center" : "justify-end"
-                  }`}
-                >
+                  }`}>
                   <div className="grid grid-cols-12 overflow-x-auto gap-y-2">
                     {initialLoad ? (
-                      <InitialLoad fn={startConversation} connecting={!connection} />
+                      <InitialLoad
+                        fn={startConversation}
+                        connecting={!connection}
+                      />
                     ) : (
                       <>
                         {chatMessages.length > 0 &&
@@ -466,8 +469,7 @@ export default function Conversation(): JSX.Element {
 
                         <div
                           className="h-16 col-start-1 col-end-13"
-                          ref={messageMarker}
-                        ></div>
+                          ref={messageMarker}></div>
                       </>
                     )}
                   </div>

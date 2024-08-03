@@ -5,7 +5,7 @@ import {
   LiveClient,
   LiveSchema,
   LiveTranscriptionEvents,
-  SpeakSchema,
+  SpeakSchema
 } from "@deepgram/sdk";
 import {
   Dispatch,
@@ -14,7 +14,7 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useState,
+  useState
 } from "react";
 import { useToast } from "./Toast";
 import { useLocalStorage } from "../lib/hooks/useLocalStorage";
@@ -34,12 +34,12 @@ interface DeepgramContextInterface {
 
 const DeepgramContext = createContext({} as DeepgramContext);
 
-const DEFAULT_TTS_MODEL = 'aura-asteria-en';
-const DEFAULT_STT_MODEL = 'nova-2';
+const DEFAULT_TTS_MODEL = "aura-asteria-en";
+const DEFAULT_STT_MODEL = "nova-2";
 
 const defaultTtsOptions = {
   model: DEFAULT_TTS_MODEL
-}
+};
 
 const defaultSttsOptions = {
   model: DEFAULT_STT_MODEL,
@@ -47,8 +47,8 @@ const defaultSttsOptions = {
   smart_format: true,
   endpointing: 550,
   utterance_end_ms: 1500,
-  filler_words: true,
-}
+  filler_words: true
+};
 
 /**
  * TTS Voice Options
@@ -65,74 +65,74 @@ const voices: {
     name: "Asteria",
     avatar: "/aura-asteria-en.svg",
     language: "English",
-    accent: "US",
+    accent: "US"
   },
   "aura-luna-en": {
     name: "Luna",
     avatar: "/aura-luna-en.svg",
     language: "English",
-    accent: "US",
+    accent: "US"
   },
   "aura-stella-en": {
     name: "Stella",
     avatar: "/aura-stella-en.svg",
     language: "English",
-    accent: "US",
+    accent: "US"
   },
   "aura-athena-en": {
     name: "Athena",
     avatar: "/aura-athena-en.svg",
     language: "English",
-    accent: "UK",
+    accent: "UK"
   },
   "aura-hera-en": {
     name: "Hera",
     avatar: "/aura-hera-en.svg",
     language: "English",
-    accent: "US",
+    accent: "US"
   },
   "aura-orion-en": {
     name: "Orion",
     avatar: "/aura-orion-en.svg",
     language: "English",
-    accent: "US",
+    accent: "US"
   },
   "aura-arcas-en": {
     name: "Arcas",
     avatar: "/aura-arcas-en.svg",
     language: "English",
-    accent: "US",
+    accent: "US"
   },
   "aura-perseus-en": {
     name: "Perseus",
     avatar: "/aura-perseus-en.svg",
     language: "English",
-    accent: "US",
+    accent: "US"
   },
   "aura-angus-en": {
     name: "Angus",
     avatar: "/aura-angus-en.svg",
     language: "English",
-    accent: "Ireland",
+    accent: "Ireland"
   },
   "aura-orpheus-en": {
     name: "Orpheus",
     avatar: "/aura-orpheus-en.svg",
     language: "English",
-    accent: "US",
+    accent: "US"
   },
   "aura-helios-en": {
     name: "Helios",
     avatar: "/aura-helios-en.svg",
     language: "English",
-    accent: "UK",
+    accent: "UK"
   },
   "aura-zeus-en": {
     name: "Zeus",
     avatar: "/aura-zeus-en.svg",
     language: "English",
-    accent: "US",
-  },
+    accent: "US"
+  }
 };
 
 const voiceMap = (model: string) => {
@@ -141,7 +141,9 @@ const voiceMap = (model: string) => {
 
 const getApiKey = async (): Promise<string> => {
   const result: CreateProjectKeyResponse = await (
-    await fetch("/api/authenticate", { cache: "no-store" })
+    await fetch("https://chatbot.poolwater-pro.com/api/deepgram/get-api-key", {
+      cache: "no-store"
+    })
   ).json();
 
   return result.key;
@@ -149,8 +151,12 @@ const getApiKey = async (): Promise<string> => {
 
 const DeepgramContextProvider = ({ children }: DeepgramContextInterface) => {
   const { toast } = useToast();
-  const [ttsOptions, setTtsOptions] = useLocalStorage<SpeakSchema | undefined>('ttsModel');
-  const [sttOptions, setSttOptions] = useLocalStorage<LiveSchema | undefined>('sttModel');
+  const [ttsOptions, setTtsOptions] = useLocalStorage<SpeakSchema | undefined>(
+    "ttsModel"
+  );
+  const [sttOptions, setSttOptions] = useLocalStorage<LiveSchema | undefined>(
+    "sttModel"
+  );
   const [connection, setConnection] = useState<LiveClient>();
   const [connecting, setConnecting] = useState<boolean>(false);
   const [connectionReady, setConnectionReady] = useState<boolean>(false);
@@ -197,7 +203,14 @@ const DeepgramContextProvider = ({ children }: DeepgramContextInterface) => {
     if (connection === undefined) {
       connect(defaultSttsOptions);
     }
-  }, [connect, connection, setSttOptions, setTtsOptions, sttOptions, ttsOptions]);
+  }, [
+    connect,
+    connection,
+    setSttOptions,
+    setTtsOptions,
+    sttOptions,
+    ttsOptions
+  ]);
 
   useEffect(() => {
     if (connection && connection?.getReadyState() !== undefined) {
@@ -236,9 +249,8 @@ const DeepgramContextProvider = ({ children }: DeepgramContextInterface) => {
         sttOptions,
         setSttOptions,
         connection,
-        connectionReady,
-      }}
-    >
+        connectionReady
+      }}>
       {children}
     </DeepgramContext.Provider>
   );
